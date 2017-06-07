@@ -1,0 +1,273 @@
+
+## <summary>policy for CitrixReciever</summary>
+
+########################################
+## <summary>
+##	Execute CitrixReciever_exec_t in the CitrixReciever domain.
+## </summary>
+## <param name="domain">
+## <summary>
+##	Domain allowed to transition.
+## </summary>
+## </param>
+#
+interface(`CitrixReciever_domtrans',`
+	gen_require(`
+		type CitrixReciever_t, CitrixReciever_exec_t;
+	')
+
+	corecmd_search_bin($1)
+	domtrans_pattern($1, CitrixReciever_exec_t, CitrixReciever_t)
+')
+
+######################################
+## <summary>
+##	Execute CitrixReciever in the caller domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`CitrixReciever_exec',`
+	gen_require(`
+		type CitrixReciever_exec_t;
+	')
+
+	corecmd_search_bin($1)
+	can_exec($1, CitrixReciever_exec_t)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to read,
+##	CitrixReciever tmp files
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`CitrixReciever_dontaudit_read_tmp_files',`
+	gen_require(`
+		type CitrixReciever_tmp_t;
+	')
+
+	dontaudit $1 CitrixReciever_tmp_t:file read_file_perms;
+')
+
+########################################
+## <summary>
+##	Read CitrixReciever tmp files
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`CitrixReciever_read_tmp_files',`
+	gen_require(`
+		type CitrixReciever_tmp_t;
+	')
+
+	files_search_tmp($1)
+	read_files_pattern($1, CitrixReciever_tmp_t, CitrixReciever_tmp_t)
+')
+
+########################################
+## <summary>
+##	Manage CitrixReciever tmp files
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`CitrixReciever_manage_tmp',`
+	gen_require(`
+		type CitrixReciever_tmp_t;
+	')
+
+	files_search_tmp($1)
+	manage_dirs_pattern($1, CitrixReciever_tmp_t, CitrixReciever_tmp_t)
+	manage_files_pattern($1, CitrixReciever_tmp_t, CitrixReciever_tmp_t)
+	manage_lnk_files_pattern($1, CitrixReciever_tmp_t, CitrixReciever_tmp_t)
+')
+
+########################################
+## <summary>
+##	Search CitrixReciever rw directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`CitrixReciever_search_rw_dir',`
+	gen_require(`
+		type CitrixReciever_rw_t;
+	')
+
+	allow $1 CitrixReciever_rw_t:dir search_dir_perms;
+	files_search_rw($1)
+')
+
+########################################
+## <summary>
+##	Read CitrixReciever rw files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`CitrixReciever_read_rw_files',`
+	gen_require(`
+		type CitrixReciever_rw_t;
+	')
+
+	read_files_pattern($1, CitrixReciever_rw_t, CitrixReciever_rw_t)
+	allow $1 CitrixReciever_rw_t:dir list_dir_perms;
+	files_search_rw($1)
+')
+
+########################################
+## <summary>
+##	Manage CitrixReciever rw files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`CitrixReciever_manage_rw_files',`
+	gen_require(`
+		type CitrixReciever_rw_t;
+	')
+
+	manage_files_pattern($1, CitrixReciever_rw_t, CitrixReciever_rw_t)
+')
+
+########################################
+## <summary>
+##	Create, read, write, and delete
+##	CitrixReciever rw dirs.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`CitrixReciever_manage_rw_dirs',`
+	gen_require(`
+		type CitrixReciever_rw_t;
+	')
+
+	manage_dirs_pattern($1, CitrixReciever_rw_t, CitrixReciever_rw_t)
+')
+
+
+########################################
+## <summary>
+##	Execute CitrixReciever in the CitrixReciever domain, and
+##	allow the specified role the CitrixReciever domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed to transition
+##	</summary>
+## </param>
+## <param name="role">
+##	<summary>
+##	The role to be allowed the CitrixReciever domain.
+##	</summary>
+## </param>
+#
+interface(`CitrixReciever_run',`
+	gen_require(`
+		type CitrixReciever_t;
+		attribute_role CitrixReciever_roles;
+	')
+
+	CitrixReciever_domtrans($1)
+	roleattribute $2 CitrixReciever_roles;
+')
+
+########################################
+## <summary>
+##	Role access for CitrixReciever
+## </summary>
+## <param name="role">
+##	<summary>
+##	Role allowed access
+##	</summary>
+## </param>
+## <param name="domain">
+##	<summary>
+##	User domain for the role
+##	</summary>
+## </param>
+#
+interface(`CitrixReciever_role',`
+	gen_require(`
+		type CitrixReciever_t;
+		attribute_role CitrixReciever_roles;
+	')
+
+	roleattribute $1 CitrixReciever_roles;
+
+	CitrixReciever_domtrans($2)
+
+	ps_process_pattern($2, CitrixReciever_t)
+	allow $2 CitrixReciever_t:process { signull signal sigkill };
+')
+
+########################################
+## <summary>
+##	All of the rules required to administrate
+##	an CitrixReciever environment
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <param name="role">
+##	<summary>
+##	Role allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`CitrixReciever_admin',`
+	gen_require(`
+		type CitrixReciever_t;
+		type CitrixReciever_tmp_t;
+		type CitrixReciever_rw_t;
+	')
+
+	allow $1 CitrixReciever_t:process { signal_perms };
+	ps_process_pattern($1, CitrixReciever_t)
+
+    tunable_policy(`deny_ptrace',`',`
+        allow $1 CitrixReciever_t:process ptrace;
+    ')
+
+	files_search_tmp($1)
+	admin_pattern($1, CitrixReciever_tmp_t)
+
+	files_search_etc($1)
+	admin_pattern($1, CitrixReciever_rw_t)
+	optional_policy(`
+		systemd_passwd_agent_exec($1)
+		systemd_read_fifo_file_passwd_run($1)
+	')
+')

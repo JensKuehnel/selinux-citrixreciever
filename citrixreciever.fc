@@ -1,0 +1,15 @@
+
+
+#/home/[^/]+/\.ICAClient(/.*)?   	--	system_u:object_r:CitrixReciever_rw_t,s0
+#/home/(.*/)\.ICAClient(/.*)?		--	system_u:object_r:CitrixReciever_rw_t,s0
+#/home/(.*/)?\.ICAClient(/.*)?		--	system_u:object_r:CitrixReciever_rw_t,s0
+
+/home/(.*/)\.ICAClient(/.*)?		--	gen_context(system_u:object_r:CitrixReciever_rw_t,s0)
+/home/(.*/)?\.ICAClient(/.*)?		--	gen_context(system_u:object_r:CitrixReciever_rw_t,s0)
+
+/opt/Citrix/ICAClient(/.*)?		gen_context(system_u:object_r:CitrixReciever_rw_t,s0)
+
+/opt/Citrix/ICAClient/wfica		--	gen_context(system_u:object_r:CitrixReciever_exec_t,s0)
+/opt/Citrix/ICAClient/AuthManagerDaemon		--	gen_context(system_u:object_r:CitrixReciever_exec_t,s0)
+/opt/Citrix/ICAClient/ServiceRecord		--	gen_context(system_u:object_r:CitrixReciever_exec_t,s0)
+

@@ -1,0 +1,202 @@
+policy_module(citrixreciever, 1.0.0)
+
+########################################
+#
+# Declarations
+#
+
+attribute_role CitrixReciever_roles;
+roleattribute system_r CitrixReciever_roles;
+
+type CitrixReciever_t;
+type CitrixReciever_exec_t;
+application_domain(CitrixReciever_t, CitrixReciever_exec_t)
+role CitrixReciever_roles types CitrixReciever_t;
+
+permissive CitrixReciever_t;
+
+type CitrixReciever_tmp_t;
+files_tmp_file(CitrixReciever_tmp_t)
+
+type CitrixReciever_rw_t;
+files_type(CitrixReciever_rw_t)
+
+########################################
+#
+# CitrixReciever local policy
+#
+allow CitrixReciever_t self:capability { setgid setuid };
+allow CitrixReciever_t self:process { fork signal_perms };
+
+allow CitrixReciever_t self:fifo_file manage_fifo_file_perms;
+allow CitrixReciever_t self:unix_stream_socket create_stream_socket_perms;
+
+manage_dirs_pattern(CitrixReciever_t, CitrixReciever_tmp_t, CitrixReciever_tmp_t)
+manage_files_pattern(CitrixReciever_t, CitrixReciever_tmp_t, CitrixReciever_tmp_t)
+manage_lnk_files_pattern(CitrixReciever_t, CitrixReciever_tmp_t, CitrixReciever_tmp_t)
+files_tmp_filetrans(CitrixReciever_t, CitrixReciever_tmp_t, { dir file lnk_file })
+
+manage_dirs_pattern(CitrixReciever_t, CitrixReciever_rw_t, CitrixReciever_rw_t)
+manage_files_pattern(CitrixReciever_t, CitrixReciever_rw_t, CitrixReciever_rw_t)
+manage_lnk_files_pattern(CitrixReciever_t, CitrixReciever_rw_t, CitrixReciever_rw_t)
+
+domain_use_interactive_fds(CitrixReciever_t)
+
+files_read_etc_files(CitrixReciever_t)
+
+auth_use_nsswitch(CitrixReciever_t)
+
+miscfiles_read_localization(CitrixReciever_t)
+
+sysnet_dns_name_resolve(CitrixReciever_t)
+
+optional_policy(`
+	gen_require(`
+		type guest_t;
+		role guest_r;
+	')
+
+	CitrixReciever_run(guest_t, guest_r)
+')
+
+optional_policy(`
+	gen_require(`
+		type staff_t;
+		role staff_r;
+	')
+
+	CitrixReciever_run(staff_t, staff_r)
+')
+
+optional_policy(`
+	gen_require(`
+		type sysadm_t;
+		role sysadm_r;
+	')
+
+	CitrixReciever_run(sysadm_t, sysadm_r)
+')
+
+optional_policy(`
+	gen_require(`
+		type unconfined_t;
+		role unconfined_r;
+	')
+
+	CitrixReciever_run(unconfined_t, unconfined_r)
+')
+
+optional_policy(`
+	gen_require(`
+		type user_t;
+		role user_r;
+	')
+
+	CitrixReciever_run(user_t, user_r)
+')
+
+optional_policy(`
+	gen_require(`
+		type xguest_t;
+		role xguest_r;
+	')
+
+	CitrixReciever_run(xguest_t, xguest_r)
+')
+
+require {
+
+        type CitrixReciever_rw_t;
+        type user_tty_device_t;
+        type data_home_t;
+        type unconfined_t;
+        type CitrixReciever_t;
+        type proc_t;
+        type CitrixReciever_t;
+        type mozilla_home_t;
+        type cupsd_var_run_t;
+        type cupsd_t;
+        type CitrixReciever_t;
+        type proc_net_t;
+        type admin_home_t;
+        type alsa_etc_rw_t;
+        type unconfined_t;
+        type http_port_t;
+        type cupsd_rw_etc_t;
+        type fs_t;
+        type xserver_t;
+        type CitrixReciever_rw_t;
+        type user_devpts_t;
+        type tmpfs_t;
+        type user_tmp_t;
+        type lpr_exec_t;
+        type xdm_var_run_t;
+        type shell_exec_t;
+
+        class fifo_file { create getattr open read unlink write };
+        class file { create execute execute_no_trans getattr open read setattr unlink write };
+        class dir { add_name read remove_name write };
+        class sock_file { read write };
+        class tcp_socket name_connect;
+        class filesystem getattr;
+        class unix_stream_socket connectto;
+        class process { execmem execstack };
+        class chr_file { append ioctl read write };
+        class file { read write };
+        class dir read;
+        class chr_file { read write };
+        class fifo_file setattr;
+        class file { getattr open read };
+        class process signull;
+}
+
+#============= CitrixReciever_t ==============
+allow CitrixReciever_t CitrixReciever_rw_t:fifo_file { create getattr open read unlink write };
+allow CitrixReciever_t CitrixReciever_rw_t:file execute;
+#allow CitrixReciever_t admin_home_t:dir { add_name read write };
+#allow CitrixReciever_t admin_home_t:file { create open read setattr write };
+allow CitrixReciever_t alsa_etc_rw_t:file { getattr open read };
+allow CitrixReciever_t cupsd_rw_etc_t:file { open read };
+
+#!!!! The file '/run/cups/cups.sock' is mislabeled on your system.
+#!!!! Fix with $ restorecon -R -v /run/cups/cups.sock
+allow CitrixReciever_t cupsd_t:unix_stream_socket connectto;
+allow CitrixReciever_t cupsd_var_run_t:sock_file { read write };
+allow CitrixReciever_t fs_t:filesystem getattr;
+
+#!!!! This avc can be allowed using the boolean 'nis_enabled'
+allow CitrixReciever_t http_port_t:tcp_socket name_connect;
+allow CitrixReciever_t lpr_exec_t:file { execute execute_no_trans getattr open read };
+allow CitrixReciever_t proc_net_t:file { getattr open read };
+allow CitrixReciever_t self:process { execmem execstack };
+
+#!!!! WARNING: 'shell_exec_t' is a base type.
+allow CitrixReciever_t shell_exec_t:file { execute execute_no_trans };
+allow CitrixReciever_t tmpfs_t:dir read;
+allow CitrixReciever_t tmpfs_t:file { getattr read write };
+
+#!!!! The file '/run/user/1000/pulse/native' is mislabeled on your system.
+#!!!! Fix with $ restorecon -R -v /run/user/1000/pulse/native
+allow CitrixReciever_t unconfined_t:unix_stream_socket connectto;
+allow CitrixReciever_t user_devpts_t:chr_file { append ioctl read write };
+allow CitrixReciever_t user_tmp_t:dir { remove_name write };
+allow CitrixReciever_t user_tmp_t:file { open unlink };
+allow CitrixReciever_t user_tmp_t:sock_file write;
+allow CitrixReciever_t xdm_var_run_t:file { getattr open read };
+allow CitrixReciever_t xserver_t:unix_stream_socket connectto;
+
+#allow CitrixReciever_t data_home_t:file read;
+#allow CitrixReciever_t data_home_t:dir read;
+
+#============= CitrixReciever_t ==============
+allow CitrixReciever_t CitrixReciever_rw_t:fifo_file setattr;
+allow CitrixReciever_t proc_t:file { getattr open read };
+allow CitrixReciever_t unconfined_t:process signull;
+allow CitrixReciever_t user_tty_device_t:chr_file { read write };
+
+dontaudit CitrixReciever_t mozilla_home_t:file { getattr open read write };
+dontaudit CitrixReciever_t mozilla_home_t:dir { add_name read remove_name write };
+dontaudit CitrixReciever_t mozilla_home_t:fifo_file { create getattr open read unlink write };
+dontaudit CitrixReciever_t mozilla_home_t:file { create unlink };
+
+
