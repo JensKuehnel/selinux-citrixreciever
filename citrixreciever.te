@@ -194,6 +194,8 @@ allow CitrixReciever_t proc_t:file { getattr open read };
 allow CitrixReciever_t unconfined_t:process signull;
 allow CitrixReciever_t user_tty_device_t:chr_file { read write };
 
+# dont let citrixreviever read mozilla_home it works perfectly without it.
+# and not yell about it
 dontaudit CitrixReciever_t mozilla_home_t:file { getattr open read write };
 dontaudit CitrixReciever_t mozilla_home_t:dir { add_name read remove_name write };
 dontaudit CitrixReciever_t mozilla_home_t:fifo_file { create getattr open read unlink write };
