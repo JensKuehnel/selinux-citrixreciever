@@ -1,5 +1,7 @@
 policy_module(citrixreciever, 1.0.0)
 
+bool citrix_allow_access_mozilla_home false;
+
 ########################################
 #
 # Declarations
@@ -196,9 +198,15 @@ allow CitrixReciever_t user_tty_device_t:chr_file { read write };
 
 # dont let citrixreviever read mozilla_home it works perfectly without it.
 # and not yell about it
-dontaudit CitrixReciever_t mozilla_home_t:file { getattr open read write };
-dontaudit CitrixReciever_t mozilla_home_t:dir { add_name read remove_name write };
-dontaudit CitrixReciever_t mozilla_home_t:fifo_file { create getattr open read unlink write };
-dontaudit CitrixReciever_t mozilla_home_t:file { create unlink };
-
+if (citrix_allow_access_mozilla_home) {
+    allow CitrixReciever_t mozilla_home_t:file { getattr open read write };
+    allow CitrixReciever_t mozilla_home_t:dir { add_name read remove_name write };
+    allow CitrixReciever_t mozilla_home_t:fifo_file { create getattr open read unlink write };
+    allow CitrixReciever_t mozilla_home_t:file { create unlink };
+} else {
+    dontaudit CitrixReciever_t mozilla_home_t:file { getattr open read write };
+    dontaudit CitrixReciever_t mozilla_home_t:dir { add_name read remove_name write };
+    dontaudit CitrixReciever_t mozilla_home_t:fifo_file { create getattr open read unlink write };
+    dontaudit CitrixReciever_t mozilla_home_t:file { create unlink };
+}
 
