@@ -1,6 +1,8 @@
 policy_module(citrixreciever, 1.0.0)
 
 bool citrix_allow_access_mozilla_home false;
+bool citrix_allow_access_home false;
+bool citrix_allow_access_data_home false;
 
 ########################################
 #
@@ -107,50 +109,56 @@ optional_policy(`
 ')
 
 require {
-
         type CitrixReciever_rw_t;
-        type user_tty_device_t;
-        type data_home_t;
-        type unconfined_t;
+        type CitrixReciever_rw_t;
         type CitrixReciever_t;
-        type proc_t;
-        type CitrixReciever_t;
-        type mozilla_home_t;
-        type cupsd_var_run_t;
-        type cupsd_t;
-        type CitrixReciever_t;
-        type proc_net_t;
         type admin_home_t;
         type alsa_etc_rw_t;
-        type unconfined_t;
-        type http_port_t;
+        type alsa_home_t;
+        type avahi_t;
+        type bin_t;
+        type cache_home_t;
+        type config_home_t;
         type cupsd_rw_etc_t;
+        type cupsd_t;
+        type cupsd_var_run_t;
+        type data_home_t;
         type fs_t;
-        type xserver_t;
-        type CitrixReciever_rw_t;
-        type user_devpts_t;
-        type tmpfs_t;
-        type user_tmp_t;
+        type http_port_t;
         type lpr_exec_t;
-        type xdm_var_run_t;
+        type mozilla_home_t;
+        type proc_net_t;
+        type proc_t;
         type shell_exec_t;
+        type sysfs_t;
+        type system_dbusd_t;
+        type systemd_hwdb_etc_t;
+        type tmpfs_t;
+        type udev_var_run_t;
+        type unconfined_dbusd_t;
+        type unconfined_t;
+        type user_devpts_t;
+        type user_fonts_t;
+        type user_home_t;
+        type user_tmp_t;
+        type user_tty_device_t;
+        type xdm_var_run_t;
+        type xserver_t;
 
-        class fifo_file { create getattr open read unlink write };
-        class file { create execute execute_no_trans getattr open read setattr unlink write };
+
+	class dbus { send_msg };
+        class chr_file { append ioctl read write };
         class dir { add_name read remove_name write };
+        class fifo_file { create getattr setattr open read unlink write };
+        class file { create execute execute_no_trans getattr open read setattr unlink write };
+        class filesystem getattr;
+        class process signull;
+        class process { execmem execstack };
         class sock_file { read write };
         class tcp_socket name_connect;
-        class filesystem getattr;
         class unix_stream_socket connectto;
-        class process { execmem execstack };
-        class chr_file { append ioctl read write };
-        class file { read write };
-        class dir read;
-        class chr_file { read write };
-        class fifo_file setattr;
-        class file { getattr open read };
-        class process signull;
 }
+
 
 #============= CitrixReciever_t ==============
 allow CitrixReciever_t CitrixReciever_rw_t:fifo_file { create getattr open read unlink write };
@@ -210,6 +218,8 @@ if (citrix_allow_access_mozilla_home) {
     dontaudit CitrixReciever_t mozilla_home_t:fifo_file { create getattr open read unlink write };
     dontaudit CitrixReciever_t mozilla_home_t:file { create unlink };
 }
+
+#
 ## Added 2018-05-02 automatically
 #
 if (citrix_allow_access_home) {
@@ -217,9 +227,23 @@ if (citrix_allow_access_home) {
     allow CitrixReciever_t user_home_t:file { open read unlink };
     allow CitrixReciever_t user_home_t:lnk_file read;
 } else {
-    dontaudit allow CitrixReciever_t user_home_t:dir { remove_name write };
-    dontaudit allow CitrixReciever_t user_home_t:file { open read unlink };
-    dontaudit allow CitrixReciever_t user_home_t:lnk_file read;
+    dontaudit CitrixReciever_t user_home_t:dir { remove_name write };
+    dontaudit CitrixReciever_t user_home_t:file { open read unlink };
+    dontaudit CitrixReciever_t user_home_t:lnk_file read;
+}
+
+if (citrix_allow_access_data_home) {
+    allow CitrixReciever_t data_home_t:dir read;
+    allow CitrixReciever_t data_home_t:file { getattr ioctl open read };
+} else {
+    dontaudit CitrixReciever_t data_home_t:dir read;
+    dontaudit CitrixReciever_t data_home_t:file { getattr ioctl open read };
+}
+
+if (citrix_allow_access_data_home) {
+    allow CitrixReciever_t config_home_t:file { getattr ioctl open read };
+} else {
+    dontaudit CitrixReciever_t config_home_t:file { getattr ioctl open read };
 }
 
 
@@ -229,9 +253,6 @@ allow CitrixReciever_t alsa_home_t:file { getattr open read };
 allow CitrixReciever_t avahi_t:dbus send_msg;
 allow CitrixReciever_t bin_t:file { execute execute_no_trans map };
 allow CitrixReciever_t cache_home_t:file { getattr map open read };
-allow CitrixReciever_t config_home_t:file { getattr ioctl open read };
-allow CitrixReciever_t data_home_t:dir read;
-allow CitrixReciever_t data_home_t:file { getattr ioctl open read };
 allow CitrixReciever_t lpr_exec_t:file map;
 allow CitrixReciever_t mozilla_home_t:dir create;
 allow CitrixReciever_t mozilla_home_t:file append;
