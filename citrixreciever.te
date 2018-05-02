@@ -190,6 +190,7 @@ allow CitrixReciever_t xserver_t:unix_stream_socket connectto;
 #allow CitrixReciever_t data_home_t:file read;
 #allow CitrixReciever_t data_home_t:dir read;
 
+
 #============= CitrixReciever_t ==============
 allow CitrixReciever_t CitrixReciever_rw_t:fifo_file setattr;
 allow CitrixReciever_t proc_t:file { getattr open read };
@@ -209,4 +210,41 @@ if (citrix_allow_access_mozilla_home) {
     dontaudit CitrixReciever_t mozilla_home_t:fifo_file { create getattr open read unlink write };
     dontaudit CitrixReciever_t mozilla_home_t:file { create unlink };
 }
+## Added 2018-05-02 automatically
+#
+if (citrix_allow_access_home) {
+    allow CitrixReciever_t user_home_t:dir { remove_name write };
+    allow CitrixReciever_t user_home_t:file { open read unlink };
+    allow CitrixReciever_t user_home_t:lnk_file read;
+} else {
+    dontaudit allow CitrixReciever_t user_home_t:dir { remove_name write };
+    dontaudit allow CitrixReciever_t user_home_t:file { open read unlink };
+    dontaudit allow CitrixReciever_t user_home_t:lnk_file read;
+}
+
+
+allow CitrixReciever_t CitrixReciever_exec_t:file map;
+allow CitrixReciever_t CitrixReciever_rw_t:file { execute_no_trans map };
+allow CitrixReciever_t alsa_home_t:file { getattr open read };
+allow CitrixReciever_t avahi_t:dbus send_msg;
+allow CitrixReciever_t bin_t:file { execute execute_no_trans map };
+allow CitrixReciever_t cache_home_t:file { getattr map open read };
+allow CitrixReciever_t config_home_t:file { getattr ioctl open read };
+allow CitrixReciever_t data_home_t:dir read;
+allow CitrixReciever_t data_home_t:file { getattr ioctl open read };
+allow CitrixReciever_t lpr_exec_t:file map;
+allow CitrixReciever_t mozilla_home_t:dir create;
+allow CitrixReciever_t mozilla_home_t:file append;
+allow CitrixReciever_t self:netlink_kobject_uevent_socket { bind create getattr setopt };
+allow CitrixReciever_t shell_exec_t:file map;
+allow CitrixReciever_t sysfs_t:dir read;
+allow CitrixReciever_t sysfs_t:file { getattr open read };
+allow CitrixReciever_t sysfs_t:lnk_file read;
+allow CitrixReciever_t system_dbusd_t:dbus send_msg;
+allow CitrixReciever_t systemd_hwdb_etc_t:file { getattr map open read };
+allow CitrixReciever_t tmpfs_t:file map;
+allow CitrixReciever_t udev_var_run_t:file { getattr open read };
+allow CitrixReciever_t unconfined_dbusd_t:unix_stream_socket connectto;
+allow CitrixReciever_t user_fonts_t:dir read;
+allow CitrixReciever_t usr_t:file map;
 
