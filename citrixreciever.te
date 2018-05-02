@@ -234,10 +234,12 @@ if (citrix_allow_access_home) {
 
 if (citrix_allow_access_data_home) {
     allow CitrixReciever_t data_home_t:dir read;
-    allow CitrixReciever_t data_home_t:file { getattr ioctl open read };
+    allow CitrixReciever_t data_home_t:file { getattr ioctl open read map unlink };
+    allow CitrixReciever_t data_home_t:lnk_file read;
 } else {
     dontaudit CitrixReciever_t data_home_t:dir read;
-    dontaudit CitrixReciever_t data_home_t:file { getattr ioctl open read };
+    dontaudit CitrixReciever_t data_home_t:file { getattr ioctl open read map unlink };
+    dontaudit CitrixReciever_t data_home_t:lnk_file read;
 }
 
 if (citrix_allow_access_data_home) {

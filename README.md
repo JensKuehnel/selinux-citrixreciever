@@ -9,7 +9,7 @@ very unclean try to limit the citrix reciever
  * make
 
 
-tested on Fedora 25
+tested on Fedora 27
 
 
 
