@@ -140,6 +140,7 @@ require {
         type user_devpts_t;
         type user_fonts_t;
         type user_home_t;
+        type user_home_dir_t;
         type user_tmp_t;
         type user_tty_device_t;
         type xdm_var_run_t;
@@ -223,10 +224,14 @@ if (citrix_allow_access_mozilla_home) {
 ## Added 2018-05-02 automatically
 #
 if (citrix_allow_access_home) {
+    allow CitrixReciever_t user_home_dir_t:dir { add_name create read remove_name write };
+    allow CitrixReciever_t user_home_dir_t:file { create getattr open read setattr unlink write };
     allow CitrixReciever_t user_home_t:dir { remove_name write };
     allow CitrixReciever_t user_home_t:file { open read unlink };
     allow CitrixReciever_t user_home_t:lnk_file read;
 } else {
+    dontaudit CitrixReciever_t user_home_dir_t:dir { add_name create read remove_name write };
+    dontaudit CitrixReciever_t user_home_dir_t:file { create getattr open read setattr unlink write };
     dontaudit CitrixReciever_t user_home_t:dir { remove_name write };
     dontaudit CitrixReciever_t user_home_t:file { open read unlink };
     dontaudit CitrixReciever_t user_home_t:lnk_file read;
